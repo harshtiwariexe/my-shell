@@ -20,8 +20,18 @@ func main() {
 			return
 		}
 
+		// Convert it into slices or array
+		words := strings.Fields(command)
+
 		// Trim newline
 		command = strings.TrimSpace(command)
+
+		if len(words) > 0 && strings.ToLower(words[0]) == "echo" {
+			rest := strings.Join(words[1:], " ")
+			fmt.Println(rest)
+		} else {
+			fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+		}
 
 		if command == "exit 0" {
 			break
@@ -30,8 +40,6 @@ func main() {
 		if command == "" {
 			return // do nothing if empty input
 		}
-
-		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 
 	}
 }
