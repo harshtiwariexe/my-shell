@@ -23,6 +23,10 @@ func main() {
 		// Trim newline
 		command = strings.TrimSpace(command)
 
+		if command == "exit 0" {
+			break
+		}
+
 		if command == "" {
 			return // do nothing if empty input
 		}
