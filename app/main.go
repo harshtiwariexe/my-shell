@@ -11,51 +11,36 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
-		fmt.Fprint(os.Stdout, "$ ")
+		fmt.Fprintf(os.Stdout, "$ ")
+		line, err := reader.ReadString('\n')
 
-		// Read input
-		command, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error reading input:", err)
-			return
+			panic(err)
 		}
 
-		// Normalize
-		command = strings.TrimSpace(command)
-		words := strings.Fields(command)
+		words := strings.Fields(strings.TrimSpace(line))
 
 		if len(words) == 0 {
-			continue // ignore empty input
+			continue
 		}
 
-		// Exit
-		if command == "exit 0" {
-			break
-		}
+		switch words[0] {
+		case "exit":
+			return
 
-		// Builtin: type
-		if strings.ToLower(words[0]) == "type" {
+		case "echo":
+			handleEcho(words[1:])
+
+		case "type":
 			if len(words) < 2 {
-				fmt.Println("type: missing operand")
+				fmt.Println("type: missing operands")
 				continue
 			}
-			rest := words[1]
-			if strings.ToLower(rest) == "invalid_command" {
-				fmt.Fprintf(os.Stdout, "%s: command not found\n", rest)
-			} else {
-				fmt.Println(rest, "is a shell builtin")
-			}
+			handleType(words[1])
 			continue
-		}
 
-		// Builtin: echo
-		if strings.ToLower(words[0]) == "echo" {
-			rest := strings.Join(words[1:], " ")
-			fmt.Println(rest)
-			continue
+		default:
+			fmt.Printf("%s: not found\n", words[0])
 		}
-
-		// Fallback: not found
-		fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
 	}
 }
